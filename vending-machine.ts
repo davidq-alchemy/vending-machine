@@ -63,7 +63,7 @@ function makeChange(amount: number): Array<[string, number]> {
   // This greedy algorithm is only correct because the US coinage system is "canonical". If this program is expanded to
   // consider arbitrary coinage systems, this algorithm will need to be changed.
   const changeInstructions: Array<[string, number]> = [];
-  let changeRemaining = change;
+  let changeRemaining = amount;
   for (const [coinName, coinAmount] of coins) {
     let coinCount = 0;
     while (changeRemaining >= coinAmount) {
