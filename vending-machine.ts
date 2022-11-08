@@ -80,5 +80,8 @@ for (const [coinName, coinAmount] of coins) {
   if (coinCount > 0) changeInstructions.push([coinName, coinCount]);
 }
 
-// TODO: format output as specified
-console.log(changeInstructions);
+const longestCoinName = changeInstructions.reduce((max, c) => Math.max(c[0].length, max), Number.MIN_VALUE);
+for (const [coinName, coinCount] of changeInstructions) {
+  console.log(`${(coinName + ':').padEnd(longestCoinName + 1)} ${coinCount}`);
+}
+console.log(`Total Change: ${change / 100} USD`);
