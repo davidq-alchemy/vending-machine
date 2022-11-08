@@ -72,6 +72,10 @@ function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
   }
 
   const currency = currencies.find(c => c.abbreviation === currencyCode);
+  if (!currency) {
+    console.error(`Unable to find currency definition for code ${currencyCode}`);
+    process.exit(1);
+  }
 
   if (!costInDollars || !paymentInDollars || !currency || help) {
     // FIXME: I don't think this conforms to the POSIX spec that was suggested.
