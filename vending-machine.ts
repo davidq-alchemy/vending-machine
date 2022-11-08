@@ -8,8 +8,8 @@ import process from 'node:process';
  *  Both <item_cost> and <payment_amount> are expected to be in dollar amounts.
  */
 
-let cost: number | undefined;
-let payment: number | undefined;
+let costInDollars: number | undefined;
+let paymentInDollars: number | undefined;
 let help = false;
 
 let arg: string | undefined;
@@ -17,12 +17,20 @@ while ((arg = process.argv.shift()) !== undefined) {
   switch (arg) {
     case '--item-cost': {
       const costInput = process.argv.shift();
-      cost = parseInt(costInput || '0');
+      costInDollars = Number(costInput);
+      if (!costInDollars) {
+        console.error(`Unable to parse '${costInput}' as item_cost.`);
+        process.exit(1);
+      }
       break;
     }
     case '--payment': {
       const paymentInput = process.argv.shift();
-      payment = parseInt(paymentInput || '0');
+      paymentInDollars = Number(paymentInput);
+      if (!paymentInDollars) {
+        console.error(`Unable to parse '${paymentInput}' as payment_amount.`);
+        process.exit(1);
+      }
       break;
     }
     case '--help':
@@ -32,7 +40,7 @@ while ((arg = process.argv.shift()) !== undefined) {
   }
 }
 
-if (!cost || !payment || help) {
+if (!costInDollars || !paymentInDollars || help) {
   // FIXME: I don't think this conforms to the POSIX spec that was suggested.
   console.log('Usage:');
   console.log('  vending-machine --item-cost <item_cost> --payment <payment_amount>')
