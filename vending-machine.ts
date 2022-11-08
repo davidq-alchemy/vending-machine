@@ -1,4 +1,28 @@
 import process from 'node:process';
+import fs from 'node:fs';
+
+type Coin = {
+  name: string,
+  value: number,
+}
+
+type Currency = {
+  abbreviation: string,
+  coins: ReadonlyArray<Coin>,
+  format: string,
+}
+
+/*
+ * Load currencies file. './currencies.json' contains an array of currency definitions for supported currencies.
+ */
+
+function loadCurrencies(path: string): ReadonlyArray<Currency> {
+  const data = JSON.parse(fs.readFileSync(path, { encoding: 'utf-8' }));
+  // FIXME: It would be nice to make this type safe.
+  return data as ReadonlyArray<Currency>;
+}
+
+const currencies = loadCurrencies('./currencies.json');
 
 /*
  * Parse command line arguments. The script requires two arguments:
@@ -8,6 +32,7 @@ import process from 'node:process';
  *  Both <item_cost> and <payment_amount> are expected to be in dollar amounts.
  */
 
+let currencyCode: string | undefined = 'USD';
 let costInDollars: number | undefined;
 let paymentInDollars: number | undefined;
 let help = false;
@@ -33,6 +58,14 @@ while ((arg = process.argv.shift()) !== undefined) {
     }
     break;
   }
+  case '--currency': {
+    currencyCode = process.argv.shift();
+    if (!currencyCode) {
+      console.error(`Unable to parse '${currencyCode}' as currency_code`);
+      process.exit(1);
+    }
+    break;
+  }
   case '--help':
   case '-h':
     help = true;
@@ -40,7 +73,9 @@ while ((arg = process.argv.shift()) !== undefined) {
   }
 }
 
-if (!costInDollars || !paymentInDollars || help) {
+const currency = currencies.find(c => c.abbreviation === currencyCode);
+
+if (!costInDollars || !paymentInDollars || !currency || help) {
   // FIXME: I don't think this conforms to the POSIX spec that was suggested.
   console.log('Usage:');
   console.log('  vending-machine --item-cost <item_cost> --payment <payment_amount>');
@@ -56,21 +91,23 @@ if (!costInDollars || !paymentInDollars || help) {
  *  From here on all currency amounts should be in pennies.
  */
 
-function makeChange(amount: number): Array<[string, number]> {
+type ChangeInstructions = ReadonlyArray<{ coin: Coin, count: number }>;
+
+function makeChange(amount: number, currency: Currency): ChangeInstructions {
   // NOTE: These coins start in sorted descending order.
-  const coins: Array<[string, number]> = [['Quarter', 25], ['Dime', 10], ['Nickel', 5], ['Penny', 1]];
+  const coinsInOrderOfDescendingValue = Array.from(currency.coins).sort((a, b) => b.value - a.value);
 
   // This greedy algorithm is only correct because the US coinage system is "canonical". If this program is expanded to
   // consider arbitrary coinage systems, this algorithm will need to be changed.
-  const changeInstructions: Array<[string, number]> = [];
+  const changeInstructions: Array<{ coin: Coin, count: number}> = [];
   let changeRemaining = amount;
-  for (const [coinName, coinAmount] of coins) {
-    let coinCount = 0;
-    while (changeRemaining >= coinAmount) {
-      coinCount++;
-      changeRemaining -= coinAmount;
+  for (const coin of coinsInOrderOfDescendingValue) {
+    let count = 0;
+    while (changeRemaining >= coin.value) {
+      count++;
+      changeRemaining -= coin.value;
     }
-    if (coinCount > 0) changeInstructions.push([coinName, coinCount]);
+    if (count > 0) changeInstructions.push({ coin, count: count });
   }
   return changeInstructions;
 }
@@ -84,10 +121,10 @@ if (change < 0) {
   process.exit(1);
 }
 
-const changeInstructions = makeChange(change);
+const changeInstructions = makeChange(change, currency);
 
-const longestCoinName = changeInstructions.reduce((max, c) => Math.max(c[0].length, max), Number.MIN_VALUE);
-for (const [coinName, coinCount] of changeInstructions) {
-  console.log(`${(coinName + ':').padEnd(longestCoinName + 1)} ${coinCount}`);
+const longestCoinName = changeInstructions.reduce((max, step) => Math.max(step.coin.name.length, max), Number.MIN_VALUE);
+for (const step of changeInstructions) {
+  console.log(`${(step.coin.name + ':').padEnd(longestCoinName + 1)} ${step.count}`);
 }
-console.log(`Total Change: ${change / 100} USD`);
+console.log(`Total Change: ${currency.format.replace('<AMOUNT>', (change / 100).toString())}`);
