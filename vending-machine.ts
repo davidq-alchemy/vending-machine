@@ -49,3 +49,36 @@ if (!costInDollars || !paymentInDollars || help) {
   console.log('  --payment:   payment amount in dollars');
   process.exit(1);
 }
+
+/*
+ *  Main program logic.
+ *
+ *  From here on all currency amounts should be in pennies.
+ */
+const cost = Math.floor(costInDollars * 100);
+const payment = Math.floor(paymentInDollars * 100);
+const change = payment - cost;
+
+if (change < 0) {
+  console.error('Payment is less than cost!');
+  process.exit(1);
+}
+
+// NOTE: These coins start in sorted descending order.
+const coins: Array<[string, number]> = [['Quarter', 25], ['Dime', 10], ['Nickel', 5], ['Penny', 1]];
+const changeInstructions: Array<[string, number]> = [];
+
+// This greedy algorithm is only correct because the US coinage system is "canonical". If this program is expanded to
+// consider arbitrary coinage systems, this algorithm will need to be changed.
+let changeRemaining = change;
+for (const [coinName, coinAmount] of coins) {
+  let coinCount = 0;
+  while (changeRemaining >= coinAmount) {
+    coinCount++;
+    changeRemaining -= coinAmount;
+  }
+  if (coinCount > 0) changeInstructions.push([coinName, coinCount]);
+}
+
+// TODO: format output as specified
+console.log(changeInstructions);
