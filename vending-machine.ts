@@ -10,6 +10,7 @@ import process from 'node:process';
 
 let cost: number | undefined;
 let payment: number | undefined;
+let help = false;
 
 let arg: string | undefined;
 while ((arg = process.argv.shift()) !== undefined) {
@@ -24,11 +25,15 @@ while ((arg = process.argv.shift()) !== undefined) {
       payment = parseInt(paymentInput || '0');
       break;
     }
+    case '--help':
+    case '-h':
+      help = true;
+      break;
   }
 }
 
-if (!cost || !payment) {
-  // FIXME: I don't think this is conforms to the POSIX spec that was suggested.
+if (!cost || !payment || help) {
+  // FIXME: I don't think this conforms to the POSIX spec that was suggested.
   console.log('Usage:');
   console.log('  vending-machine --item-cost <item_cost> --payment <payment_amount>')
   console.log('Options:');
