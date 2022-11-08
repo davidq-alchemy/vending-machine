@@ -16,7 +16,11 @@ type VendingMachineOptions = {
   cost: number,
   payment: number,
 }
-type ChangeInstructions = ReadonlyArray<{ coin: Coin, count: number }>;
+type ChangeStep = {
+  coin: Coin,
+  count: number
+}
+type ChangeInstructions = ReadonlyArray<ChangeStep>;
 
 // Helper functions
 function loadCurrencies(path: string): ReadonlyArray<Currency> {
