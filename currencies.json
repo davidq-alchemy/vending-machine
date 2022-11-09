@@ -2,6 +2,7 @@
     {
         "abbreviation": "USD",
         "format": "$<AMOUNT>",
+        "divisor": 100,
         "coins": [
             {
                 "name": "Quarter",
