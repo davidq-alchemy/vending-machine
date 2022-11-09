@@ -115,12 +115,12 @@ function makeChange(amount: number, currency: Currency): ChangeInstructions {
   return changeInstructions;
 }
 
-function printChangeInstructions(instructions: ChangeInstructions): void {
+function printChangeInstructions(instructions: ChangeInstructions, currency: Currency): void {
   const longestCoinName = instructions.reduce((max, step) => Math.max(step.coin.name.length, max), Number.MIN_VALUE);
   for (const step of instructions) {
     console.log(`${(step.coin.name + ':').padEnd(longestCoinName + 1)} ${step.count}`);
   }
-  console.log(`Total Change: ${currency.format.replace('<AMOUNT>', (change / 100).toString())}`);
+  console.log(`Total Change: ${currency.format.replace('<AMOUNT>', (change / currency.divisor).toString())}`);
 }
 
 // Main program logic
@@ -134,4 +134,4 @@ if (change < 0) {
 }
 
 const changeInstructions = makeChange(change, currency);
-printChangeInstructions(changeInstructions);
+printChangeInstructions(changeInstructions, currency);
