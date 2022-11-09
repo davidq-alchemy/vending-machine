@@ -21,5 +21,117 @@
                 "value": 1
             }
         ]
+    },
+    {
+        "abbreviation": "CAD",
+        "format": "$<AMOUNT>",
+        "divisor": 100,
+        "coins": [
+            {
+                "name": "Toonie",
+                "value": 200
+            },
+            {
+                "name": "Loonie",
+                "value": 100
+            },
+            {
+                "name": "Quarter",
+                "value": 25
+            },
+            {
+                "name": "Dime",
+                "value": 10
+            },
+            {
+                "name": "Nickel",
+                "value": 5
+            },
+            {
+                "name": "Penny",
+                "value": 1
+            }
+        ]
+    },
+    {
+        "abbreviation": "CAD",
+        "format": "$<AMOUNT>",
+        "divisor": 100,
+        "coins": [
+            {
+                "name": "Toonie",
+                "value": 200
+            },
+            {
+                "name": "Loonie",
+                "value": 100
+            },
+            {
+                "name": "Quarter",
+                "value": 25
+            },
+            {
+                "name": "Dime",
+                "value": 10
+            },
+            {
+                "name": "Nickel",
+                "value": 5
+            },
+            {
+                "name": "Penny",
+                "value": 1
+            }
+        ]
+    },
+    {
+        "abbreviation": "OMR",
+        "format": "﷼<AMOUNT>",
+        "divisor": 1000,
+        "coins": [
+            {
+                "name": "50-baisa Coin",
+                "value": 50
+            },
+            {
+                "name": "25-baisa Coin",
+                "value": 25
+            },
+            {
+                "name": "10-baisa Coin",
+                "value": 10
+            },
+            {
+                "name": "5-baisa Coin",
+                "value": 5
+            }
+        ]
+    },
+    {
+        "abbreviation": "INR",
+        "format": "₹<AMOUNT>",
+        "divisor": 100,
+        "coins": [
+            {
+                "name": "20-rupee Coin",
+                "value": 20
+            },
+            {
+                "name": "10-rupee Coin",
+                "value": 10
+            },
+            {
+                "name": "5-rupee Coin",
+                "value": 5
+            },
+            {
+                "name": "2-rupee Coin",
+                "value": 2
+            },
+            {
+                "name": "1-rupee Coin",
+                "value": 1
+            }
+        ]
     }
 ]
