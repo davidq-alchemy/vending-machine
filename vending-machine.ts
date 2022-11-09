@@ -10,6 +10,7 @@ type Currency = {
   abbreviation: string,
   coins: ReadonlyArray<Coin>,
   format: string,
+  divisor: number,
 }
 type VendingMachineOptions = {
   currency: Currency,
@@ -31,8 +32,8 @@ function loadCurrencies(path: string): ReadonlyArray<Currency> {
 
 function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
   let currencyCode: string | undefined = 'USD';
-  let costInDollars: number | undefined;
-  let paymentInDollars: number | undefined;
+  let cost: number | undefined;
+  let payment: number | undefined;
   let help = false;
 
   let arg: string | undefined;
@@ -40,8 +41,8 @@ function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
     switch (arg) {
     case '--item-cost': {
       const costInput = process.argv.shift();
-      costInDollars = Number(costInput);
-      if (!costInDollars) {
+      cost = Number(costInput);
+      if (!cost) {
         console.error(`Unable to parse '${costInput}' as item_cost.`);
         process.exit(1);
       }
@@ -49,8 +50,8 @@ function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
     }
     case '--payment': {
       const paymentInput = process.argv.shift();
-      paymentInDollars = Number(paymentInput);
-      if (!paymentInDollars) {
+      payment = Number(paymentInput);
+      if (!payment) {
         console.error(`Unable to parse '${paymentInput}' as payment_amount.`);
         process.exit(1);
       }
@@ -77,7 +78,7 @@ function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
     process.exit(1);
   }
 
-  if (!costInDollars || !paymentInDollars || !currency || help) {
+  if (!cost || !payment || !currency || help) {
     // FIXME: I don't think this conforms to the POSIX spec that was suggested.
     console.log('Usage:');
     console.log('  vending-machine --item-cost <item_cost> --payment <payment_amount> [--currency <currency_code>]');
@@ -90,8 +91,8 @@ function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
 
   return {
     currency,
-    cost: Math.floor(costInDollars * 100),
-    payment: Math.floor(paymentInDollars * 100)
+    cost: Math.floor(cost * currency.divisor),
+    payment: Math.floor(payment * currency.divisor)
   };
 }
 
