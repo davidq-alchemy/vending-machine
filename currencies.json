@@ -54,37 +54,6 @@
         ]
     },
     {
-        "abbreviation": "CAD",
-        "format": "$<AMOUNT>",
-        "divisor": 100,
-        "coins": [
-            {
-                "name": "Toonie",
-                "value": 200
-            },
-            {
-                "name": "Loonie",
-                "value": 100
-            },
-            {
-                "name": "Quarter",
-                "value": 25
-            },
-            {
-                "name": "Dime",
-                "value": 10
-            },
-            {
-                "name": "Nickel",
-                "value": 5
-            },
-            {
-                "name": "Penny",
-                "value": 1
-            }
-        ]
-    },
-    {
         "abbreviation": "OMR",
         "format": "﷼<AMOUNT>",
         "divisor": 1000,
