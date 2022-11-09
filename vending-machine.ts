@@ -1,34 +1,11 @@
 import process from 'node:process';
-import fs from 'node:fs';
-
-// Types
-type Coin = {
-  name: string,
-  value: number,
-}
-type Currency = {
-  abbreviation: string,
-  coins: ReadonlyArray<Coin>,
-  format: string,
-  divisor: number,
-}
-type VendingMachineOptions = {
-  currency: Currency,
-  cost: number,
-  payment: number,
-}
-type ChangeStep = {
-  coin: Coin,
-  count: number
-}
-type ChangeInstructions = ReadonlyArray<ChangeStep>;
-
-// Helper functions
-function loadCurrencies(path: string): ReadonlyArray<Currency> {
-  const data = JSON.parse(fs.readFileSync(path, { encoding: 'utf-8' }));
-  // FIXME: It would be nice to make this type safe.
-  return data as ReadonlyArray<Currency>;
-}
+import {
+  Coin,
+  Currency,
+  VendingMachineOptions,
+  ChangeInstructions
+} from './types';
+import { getCurrency, loadCurrencies } from './currencies.js';
 
 function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
   let currencyCode: string | undefined = 'USD';
@@ -72,7 +49,7 @@ function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
     }
   }
 
-  const currency = currencies.find(c => c.abbreviation === currencyCode);
+  const currency = getCurrency(currencies, currencyCode);
   if (!currency) {
     console.error(`Unable to find currency definition for code ${currencyCode}`);
     process.exit(1);
