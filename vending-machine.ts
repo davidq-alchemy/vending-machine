@@ -1,3 +1,10 @@
+/**
+ * @file
+ * vending-machine is a command line utility for making change. It takes two required arguments the payment amount
+ * (--payment) and the cost (--item-cost), and prints a nice set of instructions for making change. The default currency
+ * is USD but other currencies can be specified by their ISO 4217 code with the --currency option. To add support for
+ * more currencies, add a currency definition to the currencies.json file in the root of this repository.
+ */
 import process from 'node:process';
 import {
   Coin,
@@ -7,6 +14,16 @@ import {
 } from './types';
 import { getCurrency, loadCurrencies } from './currencies.js';
 
+/**
+ * Parses the command line arguments from process.argv and returns a VendingMachineOptions.
+ *
+ * Note that this function will process.exit with a (hopefully) helpful error message if the arguments aren't valid.
+ * Also note that to determine if the passed currency argument is valid this function requires an array of valid
+ * currencies. See ./currencies.ts for how to accomplish that.
+ *
+ * @param currencies - An array of supported currencies.
+ * @returns {void}
+ */
 function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
   let currencyCode: string | undefined = 'USD';
   let cost: number | undefined;
@@ -73,12 +90,20 @@ function parseArgs(currencies: ReadonlyArray<Currency>): VendingMachineOptions {
   };
 }
 
+/**
+ * Makes change for the given amount in the given currency.
+ *
+ * The algorithm implemented here is the greedy solution to this problem, which means it won't always tender the minimum
+ * number of coins for an arbitrary coinage system. Thankfully, most real world coinage systems are "canonical", which
+ * means, within that coinage system, the greedy and optimal solutions always give the same result.
+ *
+ * @param {number} amount - The total of value of change that needs to be tendered.
+ * @param {Currency} currency - The currency to make change in.
+ * @returns {ChangeInstructions} The instructions for making change.
+ */
 function makeChange(amount: number, currency: Currency): ChangeInstructions {
-  // NOTE: These coins start in sorted descending order.
   const coinsInOrderOfDescendingValue = Array.from(currency.coins).sort((a, b) => b.value - a.value);
 
-  // This greedy algorithm is only correct because the US coinage system is "canonical". If this program is expanded to
-  // consider arbitrary coinage systems, this algorithm will need to be changed.
   const changeInstructions: Array<{ coin: Coin, count: number}> = [];
   let changeRemaining = amount;
   for (const coin of coinsInOrderOfDescendingValue) {
@@ -92,6 +117,12 @@ function makeChange(amount: number, currency: Currency): ChangeInstructions {
   return changeInstructions;
 }
 
+/**
+ * Prints a ChangeInstructions object to the console with nice formatting.
+ *
+ * @param {ChangeInstructions} instructions
+ * @param {Currency} currency
+ */
 function printChangeInstructions(instructions: ChangeInstructions, currency: Currency): void {
   const longestCoinName = instructions.reduce((max, step) => Math.max(step.coin.name.length, max), Number.MIN_VALUE);
   for (const step of instructions) {
@@ -100,7 +131,9 @@ function printChangeInstructions(instructions: ChangeInstructions, currency: Cur
   console.log(`Total Change: ${currency.format.replace('<AMOUNT>', (change / currency.divisor).toString())}`);
 }
 
+//-------------------------------------------------------------------
 // Main program logic
+//-------------------------------------------------------------------
 const currencies = loadCurrencies('./currencies.json');
 const { currency, cost, payment } = parseArgs(currencies);
 const change = payment - cost;
